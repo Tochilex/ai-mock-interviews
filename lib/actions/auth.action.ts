@@ -1,10 +1,8 @@
 'use server';
 
 import { db, auth } from "@/firebase/admin";
-import { CollectionReference } from "firebase/firestore";
 
 import { cookies } from "next/headers";
-
 
 
 const ONE_WEEK = 60 * 60 * 24 * 7;
