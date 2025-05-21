@@ -64,7 +64,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-        const idToken = await   userCredential.user.getIdToken();
+        const idToken = await userCredential.user.getIdToken();
 
         if (!idToken) {
           toast.error('Sign in failed')

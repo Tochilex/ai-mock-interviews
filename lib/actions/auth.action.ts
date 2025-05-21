@@ -1,10 +1,11 @@
 'use server';
 
 import { db, auth } from "@/firebase/admin";
-
 import { cookies } from "next/headers";
 
 
+
+// Session duration (1 week)
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams) {
@@ -71,13 +72,16 @@ export async function signIn (params: SignInParams) {
     }
 }
 
+// Set session cookie
 export async function setSessionCookie(idToken: string) {
     const cookieStore = await cookies();
 
+      // Create session cookie
     const sessionCookie = await auth.createSessionCookie(idToken, {
-        expiresIn: ONE_WEEK * 1000,
+        expiresIn: ONE_WEEK * 1000, // Create session cookie
     })
 
+    // Set cookie in the browser
     cookieStore.set('session', sessionCookie, {
         maxAge: ONE_WEEK,
         httpOnly: true,
@@ -87,16 +91,17 @@ export async function setSessionCookie(idToken: string) {
     })
 }
 
+// Get current user from session cookie
 export async function getCurrentUser(): Promise<User | null> {
     const cookieStore = await cookies();
 
     const sessionCookie = cookieStore.get('session')?.value;
-
     if(!sessionCookie) return null;
 
     try {
         const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
 
+        // get user info from db
         const userRecord = await db
         .collection('users')
         .doc(decodedClaims.uid)
@@ -119,5 +124,5 @@ export async function getCurrentUser(): Promise<User | null> {
 export async function isAuthenticated() {
     const user = await getCurrentUser();
 
-    return !!user;
+    return !!user; //double exclamation to turn existence or non-existence of a user into a boolean value
 }
