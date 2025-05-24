@@ -126,3 +126,35 @@ export async function isAuthenticated() {
 
     return !!user; //double exclamation to turn existence or non-existence of a user into a boolean value
 }
+
+// Get the generated interviews
+export async function getInterviewsByUserId(userId: string): Promise<Interview[] | null> {
+    const interviews = await db
+            .collection('interviews')
+            .where('userId', '==', userId)
+            .orderBy('createdAt', 'desc')
+            .get();
+
+    return interviews.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+    })) as Interview [];
+}
+
+//Get other users interviews
+export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null> {
+    const { userId, limit = 20 } = params;
+
+    const interviews = await db
+            .collection('interviews')
+            .orderBy('createdAt', 'desc')
+            .where('finalized', '==', true)
+            .where('userId', '!=', userId)
+            .limit(limit)
+            .get();
+
+    return interviews.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+    })) as Interview [];
+}
